@@ -37,6 +37,18 @@ ThinkPHP5在保持快速开发和大道至简的核心理念不变的同时，PH
 ~~~
 www  WEB部署目录（或者子目录）
 ├─application           应用目录
+│  ├─api  
+│  │  ├─behavior       CORS跨域
+│  │  ├─controller
+│  │  ├─model         
+│  │  ├─service      
+│  │  └─validate       验证器
+│  │
+│  │
+│  ├─extra
+│  ├─lib
+│  ├─extend
+│  ├─log                日志文件
 │  ├─common             公共模块目录（可以更改）
 │  ├─module_name        模块目录
 │  │  ├─config.php      模块配置文件
@@ -117,6 +129,115 @@ www  WEB部署目录（或者子目录）
 ## 参与开发
 
 请参阅 [ThinkPHP5 核心框架包](https://github.com/top-think/framework)。
+
+## 小程序界面图
+![images](images/1.jpg)
+![images](images/2.jpg)
+![images](images/3.jpg)
+![images](images/4.jpg)
+![images](images/5.jpg)
+![images](images/6.jpg)
+
+## 请求接口
+
+首页【GET】
+
+* 首页轮播图：[http://47.102.220.78/api/v1/banner/1/](http://47.102.220.78/api/v1/banner/1)
+
+* 专栏分类：[http://47.102.220.78/api/v1/theme?ids=1,2,3](http://47.102.220.78/api/v1/theme?ids=1,2,3)
+
+* 专栏里面的元素【指定专栏1，2，3】：[http://47.102.220.78/api/v1/theme/1/](http://47.102.220.78/api/v1/theme/1)
+
+* 最新的产品：[http://47.102.220.78/api/v1/product/recent](http://47.102.220.78/api/v1/product/recent)
+
+分类【GET】
+* 所有分类：[http://47.102.220.78/api/v1/category/all/](http://47.102.220.78/api/v1/category/all)
+
+* 分类里面的内容【2，3，4，5，6，7】：[http://47.102.220.78/api/v1/product/by_category?id=7](http://47.102.220.78/api/v1/product/by_category?id=7)
+
+* 商品详情对id进行规则的限定判断：[http://47.102.220.78/api/v1/product/11/](http://47.102.220.78/api/v1/product/11)
+
+关于Token令牌【POST】
+
+* 根据code获取token令牌：[http://47.102.220.78/api/v1/token/user](http://47.102.220.78/api/v1/token/user)
+
+~~~
+    {"code":"0232ncQV06HrX021eJRV0dg3QV02ncQs"}
+~~~
+* 重新获取token【传入token验证是否过期】：[http://47.102.220.78/api/v1/token/verify](http://47.102.220.78/api/v1/token/verify)
+
+* cms第三方应用获取token令牌ac=：ac se = :secret：[http://47.102.220.78/api/v1/token/app](http://47.102.220.78/api/v1/token/app)
+
+个人中心
+
+* 收货地址【post需要传一个token】：[http://47.102.220.78/api/v1/address](http://47.102.220.78/api/v1/address)
+
+* 获取用户的收货地址【get需要传一个token】：[http://47.102.220.78/api/v1/address](http://47.102.220.78/api/v1/address)
+
+* 下单接口【post要有token 】：[http://47.102.220.78/api/v1/order](http://47.102.220.78/api/v1/order)
+~~~
+        pay: function () {
+           var token = wx.getStorageSync('token');
+          //  var token = '70a640a7e86437ccf0b5c205e51423f6';
+          console.log(token);
+          var that = this;
+          // that.getPreOrder(token, 'A303256065493535')
+          wx.request({
+            url: baseUrl + '/order',
+            header: {
+              token: token
+            },
+            data: {
+              products:
+              [
+                {
+                  product_id: 1, count: 5
+                },
+                // },
+                {
+                  product_id: 2, count: 1
+                }
+              ]
+            },
+            method: 'POST',
+            success: function (res) {
+              console.log(res.data);
+              if (res.data.pass) {
+                wx.setStorageSync('order_id', res.data.order_id);
+                that.getPreOrder(token, res.data.order_id);
+              }
+              else {
+                console.log('订单未创建成功');
+              }
+            }
+          })
+        },
+~~~
+
+* 订单详情接口【GET】：[http://47.102.220.78/api/v1/order/1/](http://47.102.220.78/api/v1/order/1)
+
+* 历史订单接口【GET】：[http://47.102.220.78/api/v1/order/by_user](http://47.102.220.78/api/v1/order/by_user)
+
+![images](images/7.jpg)
+
+*  获取cms订单接口【GET】：[http://47.102.220.78/api/v1/order/paginate](http://47.102.220.78/api/v1/order/paginate)
+
+* cms发货接口【put】：[http://47.102.220.78/api/v1/order/delivery](http://47.102.220.78/api/v1/order/delivery)
+
+支付接口【没有商户号无发进行测试】
+
+* 支付接口【post】：[http://47.102.220.78/api/v1/pay/pre_order](http://47.102.220.78/api/v1/pay/pre_order)
+
+* 回调api接口：[http://47.102.220.78/api/v1/pay/notify](http://47.102.220.78/api/v1/pay/notify)
+
+
+
+## 项目说明
+* 这个项目是看了慕课上七月老师的课程，边看边写的每个接口都是敲好在进行调试，最后cms的【模板消息】只是看了自己比较弱没有看明白这个课程让我了解到实际开发的流程，还没改成属于自己的项目。这个项目涉及到AOP和ORM思想这是之前没有接触到的东西，自己有点晚接触到
+这一些东西。
+
+* 知道了什么是事务锁，跨域，并把它部署在阿里云用的是Centos7 lamp 域名备案服务器需要三个月才可以，没办法将http转https,小程序访问只能是https
+
 
 ## 版权信息
 
