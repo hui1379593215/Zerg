@@ -135,8 +135,6 @@ www  WEB部署目录（或者子目录）
 ![images](images/2.jpg)
 ![images](images/3.jpg)
 ![images](images/4.jpg)
-![images](images/5.jpg)
-![images](images/6.jpg)
 
 ## 请求接口
 
